@@ -4,9 +4,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Month;
 import java.util.ArrayList;
+
 import java.util.List;
+import java.util.Map;
+
+
 import it.polito.tdp.PremierLeague.model.Action;
+import it.polito.tdp.PremierLeague.model.Adiacenza;
 import it.polito.tdp.PremierLeague.model.Match;
 import it.polito.tdp.PremierLeague.model.Player;
 
@@ -60,7 +66,7 @@ public class PremierLeagueDAO {
 		}
 	}
 	
-	public List<Match> listAllMatches(){
+	/*public List<Match> listAllMatches(){
 		String sql = "SELECT m.MatchID, m.TeamHomeID, m.TeamAwayID, m.teamHomeFormation, m.teamAwayFormation, m.resultOfTeamHome, m.date, t1.Name, t2.Name   "
 				+ "FROM Matches m, Teams t1, Teams t2 "
 				+ "WHERE m.TeamHomeID = t1.TeamID AND m.TeamAwayID = t2.TeamID";
@@ -87,6 +93,73 @@ public class PremierLeagueDAO {
 			e.printStackTrace();
 			return null;
 		}
+	}*/
+
+	public List<Match> getVertici(Month mese) {
+		String sql = "SELECT * "
+				+ "FROM matches "
+				+ "WHERE MONTH(DATE)=? ";
+		List<Match> result = new ArrayList<Match>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, mese.getValue());
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+
+				
+				Match match = new Match(res.getInt("MatchID"), res.getInt("TeamHomeID"), res.getInt("TeamAwayID"), res.getInt("teamHomeFormation"), 
+							res.getInt("teamAwayFormation"),res.getInt("resultOfTeamHome"), res.getTimestamp("date").toLocalDateTime());
+				
+				
+				result.add(match);
+
+			}
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
 	}
+	
+	public List<Adiacenza> getArchi(Map<Integer, Match> map, Month mese, int minuti)
+	{
+		String sql = "SELECT a1.MatchID AS m1, a2.MatchID AS m2, COUNT(*) AS peso "
+				+ "FROM 	actions a1, actions a2, matches m1, matches m2 "
+				+ "WHERE a1.MatchID> a2.MatchID AND a1.TimePlayed>=? AND a2.TimePlayed>=? "
+				+ "  AND a1.PlayerID=a2.PlayerID "
+				+ "  AND MONTH(m1.Date)=? AND MONTH(m1.Date)= MONTH(m2.Date) "
+				+ "  AND a1.MatchID=m1.MatchID AND a2.MatchID=m2.MatchID "
+				+ "GROUP BY a1.MatchID, a2.MatchID  ";
+		List<Adiacenza> result = new ArrayList<Adiacenza>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, minuti);
+			st.setInt(2, minuti);
+			st.setInt(3, mese.getValue());
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+
+				
+					Match match1 = map.get(res.getInt("m1"));
+					Match match2 = map.get(res.getInt("m2"));
+					result.add(new Adiacenza(match1, match2, res.getInt("peso")));
+				
+			}
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	
 }

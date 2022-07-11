@@ -15,7 +15,7 @@ public class Match {
 
 	LocalDateTime date;
 	
-	public Match(Integer matchID, Integer teamHomeID, Integer teamAwayID, Integer teamHomeFormation,
+	/*public Match(Integer matchID, Integer teamHomeID, Integer teamAwayID, Integer teamHomeFormation,
 			Integer teamAwayFormation, Integer resultOfTeamHome, LocalDateTime date, String teamHomeNAME, String teamAwayNAME) {
 		super();
 		this.matchID = matchID;
@@ -27,8 +27,24 @@ public class Match {
 		this.teamHomeNAME = teamHomeNAME;
 		this.teamAwayNAME = teamAwayNAME;
 		this.date = date;
-	}
+	}*/
 	
+	
+	
+	public Match(Integer matchID, Integer teamHomeID, Integer teamAwayID, Integer teamHomeFormation,
+			Integer teamAwayFormation, Integer resultOfTeamHome, LocalDateTime date) {
+		super();
+		this.matchID = matchID;
+		this.teamHomeID = teamHomeID;
+		this.teamAwayID = teamAwayID;
+		this.teamHomeFormation = teamHomeFormation;
+		this.teamAwayFormation = teamAwayFormation;
+		this.resultOfTeamHome = resultOfTeamHome;
+		this.date = date;
+	}
+
+
+
 	public Integer getMatchID() {
 		return matchID;
 	}

@@ -5,9 +5,12 @@
 package it.polito.tdp.PremierLeague;
 
 import java.net.URL;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.PremierLeague.model.Adiacenza;
 import it.polito.tdp.PremierLeague.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -39,7 +42,7 @@ public class FXMLController {
     private TextField txtMinuti; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbMese"
-    private ComboBox<?> cmbMese; // Value injected by FXMLLoader
+    private ComboBox<Month> cmbMese; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbM1"
     private ComboBox<?> cmbM1; // Value injected by FXMLLoader
@@ -53,10 +56,45 @@ public class FXMLController {
     @FXML
     void doConnessioneMassima(ActionEvent event) {
     	
+    	if(model.getGrafo()==null)
+    	{
+    		txtResult.appendText("Creare Grafo !\n");
+    		return;
+    	}
+    	for(Adiacenza a: model.getCnnessioneMax())
+    	{
+    		txtResult.appendText( a.toString()+"\n");
+    		/*txtResult.appendText( "["+ a.getM1().getMatchID()+"] "+ a.getM1().getTeamHomeNAME()+ " vs. " +a.getM1().getTeamAwayNAME()+ 
+    				" ["+ a.getM2().getMatchID()+"] "+ a.getM2().getTeamHomeNAME()+ " vs. " + a.getM2().getTeamAwayNAME()+
+    				" (" + a.getPeso()+ ")\n");*/
+    	}
+    	
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	txtResult.clear();
+    	Month mese = cmbMese.getValue();
+    	if(mese==null)
+    	{
+    		txtResult.appendText("Selezionare un mese!\n");
+    		return;
+    	}
+    	try
+    	{
+    		int minuti = Integer.parseInt(txtMinuti.getText());
+    		model.creaGrafo(mese, minuti);
+    		txtResult.appendText("Grafo Creato!\n");
+    		txtResult.appendText("VERTICI:  "+ model.nVertivi()+ "\n");
+    		txtResult.appendText("ARCHI:  "+ model.nArchi()+ "\n");
+
+    		
+    	}
+    	catch(NumberFormatException e){
+    		txtResult.appendText("Inserire un valore numerico che indica i minuti! \n");
+    		return ;
+    		
+    	}
     	
     }
 
@@ -79,6 +117,12 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	for(int i=1; i<=12; i++)
+    	{ 
+    		
+    		cmbMese.getItems().add(Month.of(i));
+    	}
   
     }
     
